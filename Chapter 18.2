@@ -1,0 +1,26 @@
+import java.util.*;
+
+public class TestReverseDisplay {
+
+    public static void main(String[] args) { //main method
+        Scanner input = new Scanner(System.in);
+        String value;
+        System.out.print("Enter your String: ");
+        value = input.nextLine();
+
+        reverseDisplay(value);
+    }
+
+    public static void reverseDisplay(String value, int high) { //helper method which includes the String's highest index
+        if (high == 0) {
+            System.out.println("");
+            return;
+        }
+        System.out.print(value.substring(high - 1)); //using substring to create a part of the string
+        reverseDisplay(value.substring(0, high - 1)); //recursive call
+    }
+
+    private static void reverseDisplay(String value) { //recursive method
+        reverseDisplay(value, value.length());
+    }
+}
