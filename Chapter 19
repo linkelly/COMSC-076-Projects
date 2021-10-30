@@ -1,0 +1,58 @@
+public class TestSort {
+
+   public static void main(String[] args) {
+       ArrayList<Integer> ints = new ArrayList<>(); //creating an ArrayList of Integer objects
+       ints.add(2);
+       ints.add(4);
+       ints.add(3);
+
+       ArrayList<String> strings = new ArrayList<>(); //creating an ArrayList of String objects
+       strings.add("Bob");
+       strings.add("Alice");
+       strings.add("Ted");
+       strings.add("Carol");
+
+       ArrayList<Double> doubles = new ArrayList<>(); //creating an ArrayList of Double objects
+       doubles.add(3.4);
+       doubles.add(1.2);
+       doubles.add(-12.3);
+
+       TestSort.<Integer>sort(ints); //calling the sort method
+       TestSort.<String>sort(strings);
+       TestSort.<Double>sort(doubles);
+       System.out.print("Sorted Integer Objects: "); //displaying the sorted ArrayLists
+       printSort(ints.toArray());
+       System.out.print("Sorted Double Objects: ");
+       printSort(doubles.toArray());
+       System.out.print("Sorted String Objects: ");
+       printSort(strings.toArray());
+   }
+
+   public static <E extends Comparable<E>> void sort(ArrayList<E> list) { //generic sort method
+       E min;
+       int minIndex;
+
+       for (int i = 0; i < list.size() - 1; i++) { //find the min in list
+           min = list.get(i);
+           minIndex = i;
+
+           for (int j = i + 1; j < list.size(); j++) {
+               if (min.compareTo(list.get(j)) > 0) {
+                   min = list.get(j);
+                   minIndex = j;
+               }
+           }
+           if (minIndex != i) { //swap with minIndex if needed
+               list.set(minIndex, list.get(i));
+               list.set(i, min);
+           }
+       }
+   }
+
+   public static void printSort(Object[] list) { //print without brackets and commas
+       for (int i = 0; i < list.length; i++) {
+           System.out.print(list[i] + " ");
+       }
+       System.out.println();
+   }
+}
