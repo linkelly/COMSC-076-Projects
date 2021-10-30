@@ -1,0 +1,59 @@
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+public class Program2 {
+
+    public static void main(String[] args) throws Exception {
+        BitOutputStream output = new BitOutputStream(new File("testOutput.dat"));
+        output.writeBit("010000100100001001101");
+        output.close();
+        System.out.println("Done");
+    }
+
+    public static class BitOutputStream {
+
+        private FileOutputStream output;
+        private int bytePosition = 0;
+        private int bits; //initial bit
+        //  programs statements
+
+        // Constructor
+        public BitOutputStream(File file) throws IOException {
+            // one statement will do the job
+            output = new FileOutputStream(file);
+        }
+
+        public void writeBit(String bitString) throws IOException {
+            for (int i = 0; i < bitString.length(); i++) {
+                writeBit(bitString.charAt(i));
+            }
+        }
+
+        public void writeBit(char bit) throws IOException {
+            // Program statements for this method
+            bits = bits << 1;
+            bytePosition++;
+            if (bit == '1') {
+                bits = bits | 1;
+            }
+            if (bytePosition == 8) {
+                output.write(bits);
+                bytePosition = 0; //reset position
+            }
+        }
+
+        /**
+         * Write the last byte and close the stream. If the last byte is not
+         * full, right-shift with zeros
+         */
+        public void close() throws IOException {
+            // Program statements for this method
+            if (bytePosition > 0) {
+                bits = bits << 8 - bytePosition; //fills in with 0 for incompleted byte
+                output.write(bits);
+            }
+            output.close();
+        }
+    }
+}
