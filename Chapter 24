@@ -1,0 +1,385 @@
+import java.util.*;
+
+public class Lists {
+
+    public static void main(String[] args) {
+        MyLinkedList<String> names = new MyLinkedList<>();
+        names.add("David");
+        names.add("Nam");
+        names.add("Andrew");
+        names.add("Aleah");
+        names.add("Jay");
+        names.add("Kelly");
+        names.add("Kevin");
+        names.add("Percy");
+        names.add("Jhess");
+        names.add("Jesus"); //adding 10 names to linked list
+        System.out.println("Tests for all methods in MyLinkedList:" + names);
+
+        System.out.println("getFirst(): " + names.getFirst()); //tests getFirst()
+
+        System.out.println("getLast(): " + names.getLast()); //tests getLast()
+
+        names.addFirst("Steven"); //tests addFirst(E e)
+
+        System.out.println("addFirst('Steven'): " + names);
+
+        names.addLast("Tony"); //tests addLastE e)
+        System.out.println("addFirst('Tony'): " + names);
+
+        names.add(2, "Tiana"); //tests add(index int, E e)
+        System.out.println("add(2, 'Tiana'): " + names);
+
+        System.out.println("removeFirst(): " + names.removeFirst()); //tests removeFirst()
+
+        System.out.println("removeLast(): " + names.removeLast()); //tests removeLast()
+
+        System.out.println("remove(5): " + names.remove(5)); //tests remove()
+
+        System.out.println("contains('Kevin'): " + names.contains("Kevin")); //tests contains()
+
+        System.out.println("get(8): " + names.get(8)); //tests get()
+
+        System.out.println("indexOf('Kelly'): " + names.indexOf("Kelly")); //tests indexOf()
+
+        System.out.println("lastIndexOf('Percy'): " + names.lastIndexOf("Percy")); //tests lastIndexOf()
+
+        names.set(5, "Beyonce"); //tests set()
+        System.out.println("set(5, Beyonce): " + names);
+
+        System.out.println("size(): " + names.size()); //tests size()
+
+        names.clear(); //tests clear()
+        System.out.println("clear(): " + names);
+
+    }
+}
+
+class MyLinkedList<E> implements MyList<E> {
+
+    private Node<E> head; //first element of the linked structure
+    private Node<E> tail; //last element of the linked structure
+    int size; //integer value of amount of elements in the linked structure
+
+    public MyLinkedList() { //creates an empty list
+
+    }
+
+    public MyLinkedList(E[] objects) {
+        for (int i = 0; i < objects.length; i++) {
+            add(objects[i]);
+        }
+    }
+
+    public E getFirst() {
+        if (size == 0) {
+            return null; //the list is empty
+        } else {
+            return head.element;
+        }
+    }
+
+    public E getLast() {
+        if (size == 0) {
+            return null;
+        } else {
+            return tail.element;
+        }
+    }
+
+    public void addFirst(E e) {
+        Node<E> newNode = new Node<>(e);
+        newNode.next = head;
+        head = newNode;
+        size++;
+
+        if (tail == null) {
+            tail = head;
+        }
+    }
+
+    public void addLast(E e) {
+        Node<E> newNode = new Node<>(e);
+        if (tail == null) {
+            head = tail = newNode;
+        } else {
+            tail.next = newNode;
+            tail = newNode;
+        }
+        size++;
+    }
+
+    @Override
+    public void add(int index, E e) {
+        if (index == 0) {
+            addFirst(e);
+        } else if (index >= size) {
+            addLast(e);
+        } else {
+            Node<E> current = head;
+            for (int i = 1; i < index; i++) {
+                current = current.next;
+            }
+            Node<E> temp = current.next;
+            current.next = new Node<>(e);
+            (current.next).next = temp;
+            size++;
+        }
+    }
+
+    public E removeFirst() {
+        if (size == 0) {
+            return null;
+        } else {
+            Node<E> temp = head;
+            head = head.next;
+            size--;
+            if (head == null) {
+                tail = null;
+            }
+            return temp.element;
+        }
+    }
+
+    public E removeLast() {
+        if (size == 0) {
+            return null;
+        } else if (size == 1) {
+            Node<E> temp = head;
+            head = tail = null;
+            size = 0;
+            return temp.element;
+        } else {
+            Node<E> current = head;
+
+            for (int i = 0; i < size - 2; i++) {
+                current = current.next;
+            }
+
+            Node<E> temp = tail;
+            tail = current;
+            tail.next = null;
+            size--;
+            return temp.element;
+        }
+    }
+
+    public E remove(int index) {
+        if (index < 0 || index >= size) {
+            return null;
+        } else if (index == 0) {
+            return removeFirst();
+        } else if (index == size - 1) {
+            return removeLast();
+        } else {
+            Node<E> previous = head;
+
+            for (int i = 1; i < index; i++) {
+                previous = previous.next;
+            }
+            Node<E> current = previous.next;
+            previous.next = current.next;
+            size--;
+            return current.element;
+        }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder("[");
+        Node<E> current = head;
+        for (int i = 0; i < size; i++) {
+            result.append(current.element);
+            current = current.next;
+            if (current != null) {
+                result.append(", ");
+            } else {
+                result.append("]");
+            }
+        }
+        return result.toString();
+    }
+
+    @Override
+    public void clear() {
+        size = 0;
+        head = tail = null;
+    }
+
+    @Override
+    public boolean contains(Object e) {
+        Node<E> current = head;
+        for (int i = 0; i < size; i++) {
+            if (current.element.equals(e)) { //if current element equals to object, return true
+                return true;
+            }
+            current = current.next; //else, keep iterating and repeat
+        }
+        return false; //if none of the elements equal object, return false
+    }
+
+    @Override
+    public E get(int index) {
+        Node<E> current = head;
+        for (int i = 0; i < size; i++) {
+            if (i == index) { //iterating, if iteration equals index, stop and return index
+                return current.element;
+            }
+            current = current.next; //if index is not specified index, keep iterating and repeat
+        }
+        return null; //index does not exist
+    }
+
+    @Override
+    public int indexOf(Object e) {
+        Node<E> current = head;
+        for (int i = 0; i < size; i++) {
+            if (current.element.equals(e)) {
+                return i; //returns order/index
+            }
+            current = current.next;
+        }
+        return -1; //no match (weird how the book had return 0 initially...)
+    }
+
+    @Override
+    public int lastIndexOf(E e) { //returns the index f th head matching element in the list
+        Node<E> current = head;
+        for (int i = 0; i < size; i++) {
+            if (current.element.equals(e)) {
+                return i;
+            }
+            current = current.next;
+        }
+        return -1;
+    }
+
+    @Override
+    public E set(int index, E e) {
+        Node<E> current = head;
+        for (int i = 0; i < size; i++) {
+            if (i == index) {
+                current.element = e;
+            }
+            current = current.next;
+        }
+        return null;
+    }
+
+    @Override
+    public int size() {
+        return size;
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        return new LinkedListIterator();
+    }
+
+    private class LinkedListIterator implements Iterator<E> {
+
+        private Node<E> current = head;
+
+        @Override
+        public boolean hasNext() {
+            return (current != null);
+        }
+
+        @Override
+        public E next() {
+            E e = current.element;
+            current = current.next;
+            return e;
+        }
+
+        @Override
+        public void remove() {
+            //finish 
+        }
+    }
+
+    private static class Node<E> {
+
+        E element;
+        Node<E> next;
+
+        public Node(E element) {
+            this.element = element;
+        }
+    }
+}
+
+interface MyList<E> extends Collection<E> {
+
+    //Add a new element at the specified index in this list. 
+    public void add(int index, E e);
+
+    //Return the element from this list at the specified index.
+    public E get(int index);
+
+    //Return the index of the first matching element in this list. Return -1 if no match. 
+    public int indexOf(Object e);
+
+    //Return the index of the last matching element in this list Return -1 if no match.
+    public int lastIndexOf(E e);
+
+    //Remove the element at the specified position in this list. Shift any subsequent elements to the left. Return the element that was removed from the list.
+    public E remove(int index);
+
+    //Replace the element at the specified position in this list with the specified element and returns the new set.
+    public E set(int index, E e);
+
+    @Override
+    //Add a new element at the end of this list
+    public default boolean add(E e) {
+        add(size(), e);
+        return true;
+    }
+
+    @Override
+    //Return true if this list contains no elements
+    public default boolean isEmpty() {
+        return size() == 0;
+    }
+
+    @Override
+    //Remove the first occurrence of the element e from this list. Shift any subsequent elements to the left. Return true if the element is removed.
+    public default boolean remove(Object e) {
+        if (indexOf(e) >= 0) {
+            remove(indexOf(e));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public default boolean containsAll(Collection<?> c) {
+        return true;
+    }
+
+    @Override
+    public default boolean addAll(Collection<? extends E> c) {
+        return true;
+    }
+
+    @Override
+    public default boolean removeAll(Collection<?> c) {
+        return true;
+    }
+
+    @Override
+    public default boolean retainAll(Collection<?> c) {
+        return true;
+    }
+
+    @Override
+    public default Object[] toArray() {
+        return null;
+    }
+
+    @Override
+    public default <T> T[] toArray(T[] array) {
+        return null;
+    }
+}
