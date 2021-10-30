@@ -1,0 +1,181 @@
+import java.util.*;
+
+public class ClosePoints {
+
+   public static void main(String[] args) {
+       double[][] points = new double[1000][2];
+       for (int i = 0; i < points.length; i++) {
+           points[i][0] = Math.random() * 100;
+           points[i][1] = Math.random() * 100;
+       }
+
+       long startTime = System.currentTimeMillis();
+       Pair closestPair = Pair.getClosestPair(points);
+       System.out.println("The shortest distance is " + closestPair.getDistance());
+       System.out.println(closestPair);
+       long endTime = System.currentTimeMillis();
+       System.out.println("Time spent on the divide-and-conquer algorithm is " + (endTime - startTime) + " milliseconds.");
+   }
+}
+
+class Pair {
+
+   Point p1;
+   Point p2;
+
+   Pair(Point p1, Point p2) {
+       this.p1 = p1;
+       this.p2 = p2;
+   }
+
+   public double getDistance() { //retuns the distance between two points
+       return distance(p1, p2);
+   }
+
+   public static Pair getClosestPair(double[][] points) { //returns the distance of the closest pair of points
+       Point[] pointsOrderedOnX = new Point[points.length];
+
+       for (int i = 0; i < pointsOrderedOnX.length; i++) {
+           pointsOrderedOnX[i] = new Point(points[i][0], points[i][1]);
+       }
+
+       return getClosestPair(pointsOrderedOnX);
+   }
+
+   public static Pair getClosestPair(Point[] points) { //return the distance of the closest pair of points
+       Arrays.sort(points);
+       Point[] pointsOrderedOnY = points.clone();
+       Arrays.sort(pointsOrderedOnY, new CompareY());
+
+       return distance(points, 0, points.length - 1, pointsOrderedOnY);
+   }
+
+   //Return the distance of the closest pair of points in pointsOrderedOnX[low, high]. This is a recursive method. 
+   //pointsOrderedOnX and pointsOrderedOnY are not changed in the subsequent recursive calls
+   public static Pair distance(Point[] pointsOrderedOnX, int low, int high, Point[] pointsOrderedOnY) {
+       int mid = 0;
+       double distance = 0;
+       ArrayList<Point> stripL = new ArrayList<Point>();
+       ArrayList<Point> stripR = new ArrayList<Point>();
+
+       if (low >= high) {
+           return null;
+       } else if (low + 1 == high) {
+           return new Pair(pointsOrderedOnX[low], pointsOrderedOnX[high]);
+       }
+
+       for (int i = 0; i < pointsOrderedOnY.length; i++) {
+           if (pointsOrderedOnY[i].x <= pointsOrderedOnX[mid].x && pointsOrderedOnY[i].x >= pointsOrderedOnX[mid].x - distance) {
+               stripL.add(pointsOrderedOnY[i]);
+           } else {
+               stripR.add(pointsOrderedOnY[i]);
+           }
+       }
+
+       mid = (low + high) / 2; //midpoint
+       Pair pair1 = distance(pointsOrderedOnX, low, mid, pointsOrderedOnY); //contains midpoint 
+       Pair pair2 = distance(pointsOrderedOnX, mid + 1, high, pointsOrderedOnY);
+
+       Pair pair = null;
+       if (pair1 == null && pair2 == null) {
+           distance = Double.MAX_VALUE;
+       } else if (pair1 == null) {
+           distance = pair2.getDistance();
+           pair = pair2;
+       } else if (pair2 == null) {
+           distance = pair1.getDistance();
+           pair = pair1;
+       } else {
+           distance = Math.min(pair1.getDistance(), pair2.getDistance());
+           if (pair1.getDistance() <= pair2.getDistance()) {
+               pair = pair1;
+           } else {
+               pair = pair2;
+           }
+       }
+
+       double d = distance;
+       int r = 0;
+       for (int i = 0; i < stripL.size(); i++) {
+           while (r < stripR.size() && stripL.get(i).y > stripR.get(r).y + distance) {
+               r++;
+           }
+           int r1 = r;
+           while (r1 < stripR.size() && stripR.get(r1).y <= stripL.get(i).y + distance) {
+               if (d > distance(stripL.get(i), stripR.get(r1))) {
+                   d = distance(stripL.get(i), stripR.get(r1));
+                   pair.p1 = stripL.get(i);
+                   pair.p2 = stripR.get(r1);
+               }
+               r1++;
+           }
+       }
+       return pair;
+   }
+
+   public static double distance(Point p1, Point p2) { //computes the distance between two points p1 and p2
+       return distance(p1.x, p1.y, p2.x, p2.y);
+   }
+
+   public static double distance(double x1, double y1, double x2, double y2) { //computes the distance between points (x1, y1) and (x2, y2)
+       return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+
+   }
+
+   @Override
+   public String toString() {
+       return "(" + p1.x + ", " + p1.y + ") and (" + p2.x + ", " + p2.y + ")";
+   }
+}
+
+class Point implements Comparable<Point> {
+
+   double x;
+   double y;
+
+   Point(double x, double y) {
+       this.x = x;
+       this.y = y;
+   }
+
+   @Override
+   public int compareTo(Point k) { //compares the x coordinates, k is short for key
+       if (x == k.x) { //if two points have the same x coordinate, compare their y coordinates
+           if (y > k.y) {
+               return 1;
+           } else if (y < k.y) {
+               return -1;
+           } else {
+               return 0;
+           }
+       } else if (x > k.x) {
+           return 1;
+       } else {
+           return -1;
+       }
+   }
+
+   public String toString() { //prints out the points in (x, y) format
+       return "(" + x + ", " + y + ")";
+   }
+}
+
+class CompareY implements Comparator<Point> { //compares two points on their y-coordinates
+
+   @Override
+   public int compare(Point k1, Point k2) { //comparator method
+       if (k1.y == k2.y) { //if two points have the same y coordinate, compare their x coordinates
+           if (k1.x > k2.x) {
+               return 1;
+           } else if (k1.x < k1.x) {
+               return -1;
+           } else {
+               return 0;
+           }
+       } else if (k1.y > k2.y) {
+           return 1;
+       } else {
+           return -1;
+       }
+   }
+}
