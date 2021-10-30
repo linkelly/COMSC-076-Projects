@@ -1,0 +1,407 @@
+package chapter.pkg25;
+
+import java.util.*;
+
+public class Chapter25 {
+
+    public static void main(String[] args) {
+        BST<String> names = new BST<>();
+        names.insert("Jhess");
+        names.insert("Aidan");
+        names.insert("Nam");
+        names.insert("David");
+        names.insert("Kevin");
+        names.insert("Jay");
+        names.insert("Andrew");
+        names.insert("Percy");
+        names.insert("Kelly");
+        names.insert("Aleah");
+
+        System.out.println("BST method tests on String Binary Search Tree containing 10 names initially:");
+        System.out.println("names.search('Andrew'): " + names.search("Andrew"));
+        System.out.println("names.insert('Remy'): " + names.insert("Remy"));
+        System.out.println("names.delete('Aidan'): " + names.delete("Aidan"));
+        System.out.print("names.inorder(): ");
+        names.inorder();
+        System.out.print("\nnames.preorder(): ");
+        names.preorder();
+        System.out.print("\nnames.postorder(): ");
+        names.postorder();
+        System.out.print("\nA path from the root to Jay is: ");
+        ArrayList<BST.TreeNode<String>> path = names.path("Jay");
+        for (int i = 0; path != null && i < path.size(); i++) {
+            System.out.print(path.get(i).element + " ");
+        }
+        System.out.println("\nnames.getSize(): " + names.getSize());
+        System.out.println("names.isEmpty(): " + names.isEmpty());
+        System.out.println("names.clear()");
+        names.clear();
+
+        BST<Integer> numbers = new BST<>();
+        numbers.insert(9);
+        numbers.insert(4);
+        numbers.insert(0);
+        numbers.insert(7);
+        numbers.insert(2);
+        numbers.insert(5);
+        numbers.insert(1);
+        numbers.insert(8);
+        numbers.insert(3);
+        numbers.insert(6);
+
+        System.out.println("\nBST method tests on Integer Binary Search Tree containing 10 numbers initially:");
+        System.out.println("numbers.search(8): " + numbers.search(8));
+        System.out.println("numbers.insert(10): " + numbers.insert(10));
+        System.out.println("numbers.delete(6): " + numbers.delete(6));
+        System.out.print("numbers.inorder(): ");
+        numbers.inorder();
+        System.out.print("\nnumbers.preorder(): ");
+        numbers.preorder();
+        System.out.print("\nnumbers.postorder(): ");
+        numbers.postorder();
+        System.out.print("\nA path from the root to 7 is: ");
+        ArrayList<BST.TreeNode<Integer>> path1 = numbers.path(7);
+        for (int i = 0; path1 != null && i < path1.size(); i++) {
+            System.out.print(path1.get(i).element + " ");
+        }
+        System.out.println("\nnumbers.getSize(): " + numbers.getSize());
+        System.out.println("numbers.isEmpty(): " + numbers.isEmpty());
+        System.out.println("numbers.clear()");
+        numbers.clear();
+    }
+}
+
+class BST<E> implements Tree<E> {
+
+    protected TreeNode<E> root;
+    protected int size = 0;
+    protected java.util.Comparator<E> c;
+
+    public BST() {
+        this.c = (e1, e2) -> ((Comparable<E>) e1).compareTo(e2);
+    }
+
+    public BST(java.util.Comparator<E> c) {
+        this.c = c;
+    }
+
+    public BST(E[] objects) {
+        this.c = (e1, e2) -> ((Comparable<E>) e1).compareTo(e2);
+        for (int i = 0; i < objects.length; i++) {
+            add(objects[i]);
+        }
+    }
+
+    public static class TreeNode<E> {
+
+        protected E element;
+        protected TreeNode<E> left;
+        protected TreeNode<E> right;
+
+        public TreeNode(E e) {
+            element = e;
+        }
+    }
+
+    protected TreeNode<E> createNewNode(E e) {
+        return new TreeNode<>(e);
+    }
+
+    @Override
+    public boolean search(E e) {
+        TreeNode<E> current = root;
+
+        while (current != null) {
+            if (c.compare(e, current.element) < 0) {
+                current = current.left;
+            } else if (c.compare(e, current.element) > 0) {
+                current = current.right;
+            } else {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean insert(E e) {
+        if (root == null) {
+            root = createNewNode(e);
+        } else {
+            TreeNode<E> parent = null;
+            TreeNode<E> current = root;
+            while (current != null) {
+                if (c.compare(e, current.element) < 0) {
+                    parent = current;
+                    current = current.left;
+                } else if (c.compare(e, current.element) > 0) {
+                    parent = current;
+                    current = current.right;
+                } else {
+                    return false;
+                }
+            }
+            if (c.compare(e, parent.element) < 0) {
+                parent.left = createNewNode(e);
+            } else {
+                parent.right = createNewNode(e);
+            }
+        }
+        size++;
+        return true;
+    }
+
+    @Override
+    public boolean delete(E e) {
+        TreeNode<E> parent = null;
+        TreeNode<E> current = root;
+        while (current != null) {
+            if (c.compare(e, current.element) < 0) {
+                parent = current;
+                current = current.left;
+            } else if (c.compare(e, current.element) > 0) {
+                parent = current;
+                current = current.right;
+            } else {
+                break;
+            }
+        }
+
+        if (current == null) {
+            return false;
+        }
+        if (current.left == null) {
+            if (parent == null) {
+                root = current.right;
+            } else {
+                if (c.compare(e, parent.element) < 0) {
+                    parent.left = current.right;
+                } else {
+                    parent.right = current.right;
+                }
+            }
+        } else {
+            TreeNode<E> parentOfRightMost = current;
+            TreeNode<E> rightMost = current.left;
+
+            while (rightMost.right != null) {
+                parentOfRightMost = rightMost;
+                rightMost = rightMost.right;
+            }
+            current.element = rightMost.element;
+
+            if (parentOfRightMost.right == rightMost) {
+                parentOfRightMost.right = rightMost.left;
+            } else {
+                parentOfRightMost.left = rightMost.left;
+            }
+        }
+        size--;
+        return true; //success
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
+    public TreeNode<E> getRoot() {
+        return root;
+    }
+
+    protected void inorder(TreeNode<E> root) {
+        if (root == null) {
+            return;
+        }
+        inorder(root.left);
+        System.out.print(root.element + " ");
+        inorder(root.right);
+    }
+
+    @Override
+    public void inorder() {
+        inorder(root);
+    }
+
+    protected void postorder(TreeNode<E> root) {
+        if (root == null) {
+            return;
+        }
+        postorder(root.left);
+        postorder(root.right);
+        System.out.print(root.element + " ");
+    }
+
+    public void postorder() {
+        postorder(root);
+    }
+
+    protected void preorder(TreeNode<E> root) {
+        if (root == null) {
+            return;
+        }
+        System.out.print(root.element + " ");
+        preorder(root.left);
+        preorder(root.right);
+    }
+
+    @Override
+    public void preorder() {
+        preorder(root);
+    }
+
+    public ArrayList<TreeNode<E>> path(E e) {
+        ArrayList<TreeNode<E>> list = new ArrayList<>();
+        TreeNode<E> current = root;
+
+        while (current != null) {
+            list.add(current);
+            if (c.compare(e, current.element) < 0) {
+                current = current.left;
+            } else if (c.compare(e, current.element) > 0) {
+                current = current.right;
+            } else {
+                break;
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        return new InorderIterator();
+    }
+
+    private class InorderIterator implements java.util.Iterator<E> {
+
+        private ArrayList<E> list = new ArrayList<>();
+        private int current = 0;
+
+        public InorderIterator() {
+            inorder();
+        }
+
+        private void inorder(TreeNode<E> root) {
+            if (root == null) {
+                return;
+            }
+            inorder(root.left);
+            list.add(root.element);
+            inorder(root.right);
+        }
+
+        private void inorder() {
+            inorder(root);
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (current < list.size()) {
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public E next() {
+            return list.get(current++);
+        }
+
+        @Override
+        public void remove() {
+            if (current == 0) {
+                throw new IllegalStateException();
+            }
+
+            delete(list.get(--current));
+            list.clear();
+            inorder();
+        }
+    }
+
+    @Override
+    public void clear() {
+        root = null;
+        size = 0;
+    }
+}
+
+interface Tree<E> extends Collection<E> {
+
+    public boolean search(E e);
+
+    public boolean insert(E e);
+
+    public boolean delete(E e);
+
+    public int getSize();
+
+    public default void inorder() {
+
+    }
+
+    public default void postorder() {
+
+    }
+
+    public default void preorder() {
+
+    }
+
+    @Override
+    public default boolean isEmpty() {
+        return size() == 0;
+    }
+
+    @Override
+    public default boolean contains(Object e) {
+        return search((E) e);
+    }
+
+    @Override
+    public default boolean add(E e) {
+        return insert(e);
+    }
+
+    @Override
+    public default boolean remove(Object e) {
+        return delete((E) e);
+    }
+
+    @Override
+    public default int size() {
+        return getSize();
+    }
+
+    @Override
+    public default boolean containsAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public default boolean addAll(Collection<? extends E> c) {
+        return false;
+    }
+
+    @Override
+    public default boolean removeAll(Collection<?> c) {
+        //finish up
+        return false;
+    }
+
+    @Override
+    public default boolean retainAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public default Object[] toArray() {
+        return null;
+    }
+
+    @Override
+    public default <T> T[] toArray(T[] array) {
+        return null;
+    }
+}
