@@ -1,0 +1,41 @@
+import java.util.*;
+import java.io.File;
+import java.io.*;
+
+public class NumberOfWords {
+
+    public static void main(String[] args) {
+        System.out.println("Display words and their count in ascending order of the words:");
+
+        File file = new File(args[0]); //creates a file object
+
+        Map<String, Integer> treeMap = new TreeMap<>(); //tree map
+        try {
+            Scanner input = new Scanner(file); 
+
+            while (input.hasNext()) {
+                String fileName = input.nextLine();
+                String[] words = fileName.split("[^\\w]"); //list of words and removes all special characters and numbers
+
+                for (int i = 0; i < words.length; i++) {
+                    String key = words[i].toLowerCase(); //changes words to lowercase for easy runthrough
+                    if (key.length() > 0 && Character.isLetter(key.charAt(0))) {
+                        if (treeMap.containsKey(key) == false) {
+                            treeMap.put(key, 1);
+                        } else {
+                            int value = treeMap.get(key);
+                            value++;
+                            treeMap.put(key, value);
+                        }
+                    }
+                }
+            }
+        } catch (Exception ex) { //exception
+            ex.printStackTrace(); 
+        }
+        Set<Map.Entry<String, Integer>> entrySet = treeMap.entrySet(); //creates an entry set and stores treeMap elements 
+        for (Map.Entry<String, Integer> entry : entrySet) {
+            System.out.println(entry.getValue() + "\t" + entry.getKey()); //formats and prints out set
+        }
+    }
+}
