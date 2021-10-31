@@ -1,0 +1,654 @@
+import java.util.*;
+
+public class AVLTrees {
+
+    public static void main(String[] args) {
+        System.out.println("*All times are in milliseconds.*\n");
+        ArrayList<Integer> nums = new ArrayList<>();
+        for (int i = 0; i < 500000; i++) {
+            nums.add(i);
+        }
+        Collections.shuffle(nums);
+
+        BST<Integer> BSTint = new BST<>();
+        System.out.println("Binary Search Tree:");
+        System.out.println("Inserting 500,000 numbers into a Binary Search Tree...");
+        long insertSTforBST = System.currentTimeMillis();
+        for (Integer integer : nums) {
+            BSTint.insert(integer);
+        }
+        long insertETforBST = System.currentTimeMillis();
+        long insertTforBST = insertETforBST - insertSTforBST;
+        System.out.println("Insertion time for Binary Search Tree is: " + insertTforBST + "ms");
+
+        System.out.println("\nShuffling the 500,000 numbers...\n");
+        Collections.shuffle(nums);
+
+        System.out.println("Searching the 500,000 numbers in the Binary Search Tree...");
+        long searchSTforBST = System.currentTimeMillis();
+        for (Integer integer : nums) {
+            BSTint.search(integer);
+        }
+        long searchETforBST = System.currentTimeMillis();
+        long searchTforBST = searchETforBST - searchSTforBST;
+        System.out.println("Search time for Binary Search Tree is: " + searchTforBST + "ms");
+
+        System.out.println("\nShuffling the 500,000 numbers...\n");
+        Collections.shuffle(nums);
+
+        System.out.println("Deleting all elements in the Binary Search Tree...");
+        long deleteSTforBST = System.currentTimeMillis();
+        for (Integer integer : nums) {
+            BSTint.delete(integer);
+        }
+        long deleteETforBST = System.currentTimeMillis();
+        long deleteTforBST = deleteETforBST - deleteSTforBST;
+        System.out.println("Deletion time for Binary Search Tree is: " + deleteTforBST + "ms");
+
+        System.out.println("-----------------------------------------------------------------");
+
+        AVLTree<Integer> AVLint = new AVLTree<>();
+        System.out.println("AVL Tree:");
+        System.out.println("Inserting 500,000 numbers into an AVL Tree...");
+        long insertSTforAVL = System.currentTimeMillis();
+        for (Integer integer : nums) {
+            AVLint.insert(integer);
+        }
+        long insertETforAVL = System.currentTimeMillis();
+        long insertTforAVL = insertETforAVL - insertSTforAVL;
+        System.out.println("Insertion time for AVL Tree is: " + insertTforAVL + "ms");
+
+        System.out.println("\nShuffling the 500,000 numbers...\n");
+        Collections.shuffle(nums);
+
+        System.out.println("Searching the 500,000 numbers in the AVL Tree...");
+        long searchSTforAVL = System.currentTimeMillis();
+        for (Integer integer : nums) {
+            AVLint.search(integer);
+        }
+        long searchETforAVL = System.currentTimeMillis();
+        long searchTforAVL = searchETforAVL - searchSTforAVL;
+        System.out.println("Search time for AVL Tree is: " + searchTforAVL + "ms");
+
+        System.out.println("\nShuffling the 500,000 numbers...\n");
+        Collections.shuffle(nums);
+
+        System.out.println("Deleting all elements in the AVL Tree...");
+        long deleteSTforAVL = System.currentTimeMillis();
+        for (Integer integer : nums) {
+            AVLint.delete(integer);
+        }
+        long deleteETforAVL = System.currentTimeMillis();
+        long deleteTforAVL = deleteETforAVL - deleteSTforAVL;
+        System.out.println("Deletion time for AVL is: " + deleteTforAVL + "ms");
+    }
+}
+
+class BST<E> implements Tree<E> {
+
+    protected TreeNode<E> root;
+    protected int size = 0;
+    protected java.util.Comparator<E> c;
+
+    public BST() {
+        this.c = (e1, e2) -> ((Comparable<E>) e1).compareTo(e2);
+    }
+
+    public BST(java.util.Comparator<E> c) {
+        this.c = c;
+    }
+
+    public BST(E[] objects) {
+        this.c = (e1, e2) -> ((Comparable<E>) e1).compareTo(e2);
+        for (int i = 0; i < objects.length; i++) {
+            add(objects[i]);
+        }
+    }
+
+    public static class TreeNode<E> {
+
+        protected E element;
+        protected TreeNode<E> left;
+        protected TreeNode<E> right;
+
+        public TreeNode(E e) {
+            element = e;
+        }
+    }
+
+    protected TreeNode<E> createNewNode(E e) {
+        return new TreeNode<>(e);
+    }
+
+    @Override
+    public boolean search(E e) {
+        TreeNode<E> current = root;
+
+        while (current != null) {
+            if (c.compare(e, current.element) < 0) {
+                current = current.left;
+            } else if (c.compare(e, current.element) > 0) {
+                current = current.right;
+            } else {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean insert(E e) {
+        if (root == null) {
+            root = createNewNode(e);
+        } else {
+            TreeNode<E> parent = null;
+            TreeNode<E> current = root;
+            while (current != null) {
+                if (c.compare(e, current.element) < 0) {
+                    parent = current;
+                    current = current.left;
+                } else if (c.compare(e, current.element) > 0) {
+                    parent = current;
+                    current = current.right;
+                } else {
+                    return false;
+                }
+            }
+            if (c.compare(e, parent.element) < 0) {
+                parent.left = createNewNode(e);
+            } else {
+                parent.right = createNewNode(e);
+            }
+        }
+        size++;
+        return true;
+    }
+
+    @Override
+    public boolean delete(E e) {
+        TreeNode<E> parent = null;
+        TreeNode<E> current = root;
+        while (current != null) {
+            if (c.compare(e, current.element) < 0) {
+                parent = current;
+                current = current.left;
+            } else if (c.compare(e, current.element) > 0) {
+                parent = current;
+                current = current.right;
+            } else {
+                break;
+            }
+        }
+
+        if (current == null) {
+            return false;
+        }
+        if (current.left == null) {
+            if (parent == null) {
+                root = current.right;
+            } else {
+                if (c.compare(e, parent.element) < 0) {
+                    parent.left = current.right;
+                } else {
+                    parent.right = current.right;
+                }
+            }
+        } else {
+            TreeNode<E> parentOfRightMost = current;
+            TreeNode<E> rightMost = current.left;
+
+            while (rightMost.right != null) {
+                parentOfRightMost = rightMost;
+                rightMost = rightMost.right;
+            }
+            current.element = rightMost.element;
+
+            if (parentOfRightMost.right == rightMost) {
+                parentOfRightMost.right = rightMost.left;
+            } else {
+                parentOfRightMost.left = rightMost.left;
+            }
+        }
+        size--;
+        return true; //success
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
+    public TreeNode<E> getRoot() {
+        return root;
+    }
+
+    protected void inorder(TreeNode<E> root) {
+        if (root == null) {
+            return;
+        }
+        inorder(root.left);
+        System.out.print(root.element + " ");
+        inorder(root.right);
+    }
+
+    @Override
+    public void inorder() {
+        inorder(root);
+    }
+
+    protected void postorder(TreeNode<E> root) {
+        if (root == null) {
+            return;
+        }
+        postorder(root.left);
+        postorder(root.right);
+        System.out.print(root.element + " ");
+    }
+
+    public void postorder() {
+        postorder(root);
+    }
+
+    protected void preorder(TreeNode<E> root) {
+        if (root == null) {
+            return;
+        }
+        System.out.print(root.element + " ");
+        preorder(root.left);
+        preorder(root.right);
+    }
+
+    @Override
+    public void preorder() {
+        preorder(root);
+    }
+
+    public ArrayList<TreeNode<E>> path(E e) {
+        ArrayList<TreeNode<E>> list = new ArrayList<>();
+        TreeNode<E> current = root;
+
+        while (current != null) {
+            list.add(current);
+            if (c.compare(e, current.element) < 0) {
+                current = current.left;
+            } else if (c.compare(e, current.element) > 0) {
+                current = current.right;
+            } else {
+                break;
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        return new InorderIterator();
+    }
+
+    private class InorderIterator implements java.util.Iterator<E> {
+
+        private ArrayList<E> list = new ArrayList<>();
+        private int current = 0;
+
+        public InorderIterator() {
+            inorder();
+        }
+
+        private void inorder(TreeNode<E> root) {
+            if (root == null) {
+                return;
+            }
+            inorder(root.left);
+            list.add(root.element);
+            inorder(root.right);
+        }
+
+        private void inorder() {
+            inorder(root);
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (current < list.size()) {
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public E next() {
+            return list.get(current++);
+        }
+
+        @Override
+        public void remove() {
+            if (current == 0) {
+                throw new IllegalStateException();
+            }
+
+            delete(list.get(--current));
+            list.clear();
+            inorder();
+        }
+    }
+
+    @Override
+    public void clear() {
+        root = null;
+        size = 0;
+    }
+}
+
+interface Tree<E> extends Collection<E> {
+
+    public boolean search(E e);
+
+    public boolean insert(E e);
+
+    public boolean delete(E e);
+
+    public int getSize();
+
+    public default void inorder() {
+
+    }
+
+    public default void postorder() {
+
+    }
+
+    public default void preorder() {
+
+    }
+
+    @Override
+    public default boolean isEmpty() {
+        return size() == 0;
+    }
+
+    @Override
+    public default boolean contains(Object e) {
+        return search((E) e);
+    }
+
+    @Override
+    public default boolean add(E e) {
+        return insert(e);
+    }
+
+    @Override
+    public default boolean remove(Object e) {
+        return delete((E) e);
+    }
+
+    @Override
+    public default int size() {
+        return getSize();
+    }
+
+    @Override
+    public default boolean containsAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public default boolean addAll(Collection<? extends E> c) {
+        return false;
+    }
+
+    @Override
+    public default boolean removeAll(Collection<?> c) {
+        //finish up
+        return false;
+    }
+
+    @Override
+    public default boolean retainAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public default Object[] toArray() {
+        return null;
+    }
+
+    @Override
+    public default <T> T[] toArray(T[] array) {
+        return null;
+    }
+}
+
+class AVLTree<E> extends BST<E> {
+
+    public AVLTree() {
+    }
+
+    public AVLTree(java.util.Comparator<E> c) {
+        super(c);
+    }
+
+    public AVLTree(E[] objects) {
+        super(objects);
+    }
+
+    @Override
+    protected AVLTreeNode<E> createNewNode(E e) {
+        return new AVLTreeNode<E>(e);
+    }
+
+    @Override
+    public boolean insert(E e) {
+        boolean successful = super.insert(e);
+        if (!successful) {
+            return false;
+        } else {
+            balancePath(e);
+        }
+
+        return true;
+    }
+
+    private void updateHeight(AVLTreeNode<E> node) {
+        if (node.left == null && node.right == null) {
+            node.height = 0;
+        } else if (node.left == null) {
+            node.height = 1 + ((AVLTreeNode<E>) (node.right)).height;
+        } else if (node.right == null) {
+            node.height = 1 + ((AVLTreeNode<E>) (node.left)).height;
+        } else {
+            node.height = 1
+                    + Math.max(((AVLTreeNode<E>) (node.right)).height,
+                            ((AVLTreeNode<E>) (node.left)).height);
+        }
+    }
+
+    private void balancePath(E e) {
+        java.util.ArrayList<TreeNode<E>> path = path(e);
+        for (int i = path.size() - 1; i >= 0; i--) {
+            AVLTreeNode<E> A = (AVLTreeNode<E>) (path.get(i));
+            updateHeight(A);
+            AVLTreeNode<E> parentOfA = (A == root) ? null
+                    : (AVLTreeNode<E>) (path.get(i - 1));
+
+            switch (balanceFactor(A)) {
+                case -2:
+                    if (balanceFactor((AVLTreeNode<E>) A.left) <= 0) {
+                        balanceLL(A, parentOfA);
+                    } else {
+                        balanceLR(A, parentOfA);
+                    }
+                    break;
+                case +2:
+                    if (balanceFactor((AVLTreeNode<E>) A.right) >= 0) {
+                        balanceRR(A, parentOfA);
+                    } else {
+                        balanceRL(A, parentOfA);
+                    }
+            }
+        }
+    }
+
+    private int balanceFactor(AVLTreeNode<E> node) {
+        if (node.right == null) {
+            return -node.height;
+        } else if (node.left == null) {
+            return +node.height;
+        } else {
+            return ((AVLTreeNode<E>) node.right).height
+                    - ((AVLTreeNode<E>) node.left).height;
+        }
+    }
+
+    private void balanceLL(TreeNode<E> A, TreeNode<E> parentOfA) {
+        TreeNode<E> B = A.left;
+
+        if (A == root) {
+            root = B;
+        } else {
+            if (parentOfA.left == A) {
+                parentOfA.left = B;
+            } else {
+                parentOfA.right = B;
+            }
+        }
+
+        A.left = B.right;
+        B.right = A;
+        updateHeight((AVLTreeNode<E>) A);
+        updateHeight((AVLTreeNode<E>) B);
+    }
+
+    private void balanceLR(TreeNode<E> A, TreeNode<E> parentOfA) {
+        TreeNode<E> B = A.left;
+        TreeNode<E> C = B.right;
+
+        if (A == root) {
+            root = C;
+        } else {
+            if (parentOfA.left == A) {
+                parentOfA.left = C;
+            } else {
+                parentOfA.right = C;
+            }
+        }
+
+        A.left = C.right;
+        B.right = C.left;
+        C.left = B;
+        C.right = A;
+
+        updateHeight((AVLTreeNode<E>) A);
+        updateHeight((AVLTreeNode<E>) B);
+        updateHeight((AVLTreeNode<E>) C);
+    }
+
+    private void balanceRR(TreeNode<E> A, TreeNode<E> parentOfA) {
+        TreeNode<E> B = A.right;
+
+        if (A == root) {
+            root = B;
+        } else {
+            if (parentOfA.left == A) {
+                parentOfA.left = B;
+            } else {
+                parentOfA.right = B;
+            }
+        }
+
+        A.right = B.left;
+        B.left = A;
+        updateHeight((AVLTreeNode<E>) A);
+        updateHeight((AVLTreeNode<E>) B);
+    }
+
+    private void balanceRL(TreeNode<E> A, TreeNode<E> parentOfA) {
+        TreeNode<E> B = A.right;
+        TreeNode<E> C = B.left;
+
+        if (A == root) {
+            root = C;
+        } else {
+            if (parentOfA.left == A) {
+                parentOfA.left = C;
+            } else {
+                parentOfA.right = C;
+            }
+        }
+
+        A.right = C.left;
+        B.left = C.right;
+        C.left = A;
+        C.right = B;
+        updateHeight((AVLTreeNode<E>) A);
+        updateHeight((AVLTreeNode<E>) B);
+        updateHeight((AVLTreeNode<E>) C);
+    }
+
+    @Override
+    public boolean delete(E element) {
+        if (root == null) {
+            return false;
+        }
+        TreeNode<E> parent = null;
+        TreeNode<E> current = root;
+        while (current != null) {
+            if (c.compare(element, current.element) < 0) {
+                parent = current;
+                current = current.left;
+            } else if (c.compare(element, current.element) > 0) {
+                parent = current;
+                current = current.right;
+            } else {
+                break;
+            }
+        }
+
+        if (current == null) {
+            return false;
+        }
+        if (current.left == null) {
+            if (parent == null) {
+                root = current.right;
+            } else {
+                if (c.compare(element, parent.element) < 0) {
+                    parent.left = current.right;
+                } else {
+                    parent.right = current.right;
+                }
+
+                balancePath(parent.element);
+            }
+        } else {
+            TreeNode<E> parentOfRightMost = current;
+            TreeNode<E> rightMost = current.left;
+
+            while (rightMost.right != null) {
+                parentOfRightMost = rightMost;
+                rightMost = rightMost.right;
+            }
+
+            current.element = rightMost.element;
+
+            if (parentOfRightMost.right == rightMost) {
+                parentOfRightMost.right = rightMost.left;
+            } else {
+                parentOfRightMost.left = rightMost.left;
+            }
+
+            balancePath(parentOfRightMost.element);
+        }
+
+        size--;
+        return true;
+    }
+
+    protected static class AVLTreeNode<E> extends BST.TreeNode<E> {
+
+        protected int height = 0; // New data field
+
+        public AVLTreeNode(E o) {
+            super(o);
+        }
+    }
+}
